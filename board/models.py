@@ -25,6 +25,9 @@ class Category(models.Model):
         # DB에 기본적으로 설정될 정렬값
         ordering = ['slug']
 
+    def __str__(self):
+        return self.name
+
 # Setting에 있는 User 모델을 커스텀한 경우 불러서 써야하니까
 from django.contrib.auth import get_user_model
 class Document(models.Model):
@@ -39,3 +42,6 @@ class Document(models.Model):
     image = models.ImageField(upload_to='board_images/%Y/%m/%d')
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title

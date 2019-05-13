@@ -1,0 +1,7 @@
+*.pyc
+*~
+/venv
+__pycache__
+db.sqiite3
+.DS_Store
+/config/settings.py

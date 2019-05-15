@@ -1,11 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{{object.title}} {{object.text}} {{object.image.url}} {{object.author.username}}<br>
+{% extends 'base.html' %}
+{% block title %}
+Photo Create
+{% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="row">
+    <div class="col"></div>
+    <div class="col-6">
+       {{object.title}} {{object.text}} {{object.image.url}} {{object.author.username}}<br>
+    </div>
+    <div class="col"></div>
+</div>
+{% endblock %}

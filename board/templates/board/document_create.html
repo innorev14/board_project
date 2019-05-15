@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}
+Photo Create
+{% endblock %}
+
+{% block content %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
@@ -13,7 +12,5 @@
     </table>
 
     <input type="submit" value="Write">
-
 </form>
-</body>
-</html>
+{% endblock %}

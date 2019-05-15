@@ -1,12 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
-{% for object in object_list %}
-{{object.title}} {{object.text}} {{object.image.url}} {{object.author.username}}<br>
-{% endfor %}
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table table-striped">
+
+    {% for object in object_list %}
+    <tr>
+        <td>{{object.id}}</td>
+        <td>{{object.title}}</td>
+        <td>{{object.author.username}}</td>
+        <td>{{object.updated}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% for page in page_range %}
+        <li class="page-item"><a class="page-link" href="{% url 'board:list' %}?page={{page}}">{{page}}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
+
+<form action="" method="get" id="search_form" class="">
+    {%csrf_token%}
+    <div class="form-row align-items-center justify-content-center">
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="username" name="search_type">
+            <label class="form-check-label" for="inlineCheckbox1">작성자</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="title" name="search_type" checked>
+            <label class="form-check-label" for="inlineCheckbox2">제목</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" id="inlineCheckbox3" value="text" name="search_type">
+            <label class="form-check-label" for="inlineCheckbox3">본문</label>
+        </div>
+    </div>
+    <div class="form-row align-items-center justify-content-center">
+        <div class="col-sm-3 my-1">
+            <input type="text" class="form-control" placeholder="Search Keyword" name="search_key">
+        </div>
+
+        <div class="col-auto my-1">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

@@ -193,12 +193,27 @@ def document_delete(request, document_id):
 # 과제2 bootstrap 디자인, 템플릿, 확장
 
 # 20190514
-# 과제1: Document, Category, Board
-# 모델까지
-# 확장
-# 과제2: 검색
-# 페이지
-# 구현, Board?, Category?, Document?
-#
+# 과제1: Document, Category, Board 모델까지 확장
+# Category - board = models.ForeignKey(Board)
+# 게시판에서의 category - 질문, 답변, 판매, 구매
+# 쇼핑몰에서의 category - 상의, 하의, -> 상위 카테고리 - 하위코테고리
+# category에 depth를 어떻게 구현할 것이냐? 고민!
+# 과제2: 검색 페이지 구현, Board?, Category?, Document?
+# ex) 검색시 programming이라는 이름을 가진 1) 게시판, 2) 카테고리, 3) 게시글
 # 과제3: 전화번호부
 # 구현 - 이름, 전화번호, 메모 + 검색
+
+from allauth.account.signals import user_signed_up
+from allauth.socialaccount.models import SocialAccount
+# 과제 : 페이스북으로 소셜 로그인 - heroku 업로드
+# 시그널이 발생했을 때 실행 될 함수
+def naver_signup(request, user, **kwargs):
+    social_user = SocialAccount.objects.filter(user=user)
+    if social_user.exists():
+        user.last_name = social_user[0].extra_data['name']
+        user.save()
+# 시그널과 해당 함수 connect
+# 시그널 연결방법 2가지 receiver 쓰는 방법, connect 쓰는 방법
+user_signed_up.connect(naver_signup)
+
+

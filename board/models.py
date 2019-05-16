@@ -3,7 +3,7 @@ from django.urls import reverse
 # Create your models here.
 '''
 2. 모델 document - author, cartegory,title, text, image, created, updated
-3. 모델 category - slub, name
+3. 모델 category - slug, name
 '''
 class Board(models.Model):
     # board안에 category, document가 속하는 형태도 가능
@@ -48,3 +48,24 @@ class Document(models.Model):
 
     def get_absolute_url(self):
         return reverse("board:detail", args=[self.id])
+
+class Comment(models.Model):
+    # Todo : 댓글 남기기를 위해서 Form
+    # Todo : 뷰 처리는 Document의 뷰
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True, related_name='comments')
+
+    text = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    like = models.IntegerField(default=0) #ManyToMany
+    dislike = models.IntegerField(default=0)
+
+    def __str__(self):
+        return (self.author.username if self.author else "무명") + "의 댓글"
+
+    class Meta:
+        ordering = ['-id']
+
+
+

@@ -4,19 +4,13 @@ Photo Create
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col"></div>
-    <div class="col-6">
-        <form action="" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
+<form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
 
-            <table>
-                {{form.as_table}}
-            </table>
+    <table>
+    {{form.as_table}}
+    </table>
 
-            <input type="submit" value="Update">
-        </form>
-    </div>
-    <div class="col"></div>
-</div>
+    <input type="submit" value="Update">
+</form>
 {% endblock %}

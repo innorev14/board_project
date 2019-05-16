@@ -114,7 +114,7 @@ from .forms import DocumentForm
 #로그인을 한사람만 접근
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-@login_required() # -> login이 되었을 경우에만 document_create 실행됨
+@login_required # -> login이 되었을 경우에만 document_create 실행됨
 def document_create(request):
     #Document.objects.create() - 실행과 동시에 DB에 삽입(올바른 데이터가 있어야 함)
     # 분기 필요!! - post, get
@@ -127,7 +127,7 @@ def document_create(request):
         if form.is_valid():
             document = form.save()
             return redirect(document)
-            #return redirect(reverse('board:detail', args=[document.id]))
+            #return redirect(reverse('board:detail', args=[document_id]))
     else:
         # 입력창
         # Form 사용
@@ -135,7 +135,7 @@ def document_create(request):
 
     return render(request, 'board/document_create.html', {'form':form})
 
-def document_update(request):
+def document_update(request, document_id):
     # 객체 불러와서, 데이터 수정
     if request.method == "POST":
         #document = Document.objects.get(pk=document_id)
@@ -180,8 +180,100 @@ def document_update(request):
 def document_detail(request, document_id):
     #단일 객체 던지고 -> 컨텍스트 밸류로 받음
     #document = Document.objects.get(pk=document_id)
-    document = get_list_or_404(Document)
-    return render(request, 'board/document_detail.html', {'object':document})
+    document = get_object_or_404(Document, pk=document_id)
+    # 만약 post일 때만 댓글 입력에 관한 처리를 한다
+
+    # if request.method == "POST":
+    #     comment_form = CommentForm(request.POST)
+    #     comment_form.instance.author_id = request.user.id
+    #     comment_form.instance.document_id = document_id
+    #     if comment_form.is_valid():
+    #         comment = comment_form.save()
+    comment_form = CommentForm()
+    comments = document.comments.all()
+    return render(request, 'board/document_detail.html', {'object':document, 'comments':comments, 'comment_form':comment_form})
+
+'''
+form = CommentForm()
+self.instance = Comment()
+self.instance.text = 
+'''
+from .forms import CommentForm
+# ajax사용해서 댓글 달기
+def comment_create(request, document_id):
+    document = get_object_or_404(Document, pk=document_id)
+    comment_form = CommentForm(request.POST)
+    comment_form.instance.author_id = request.user.id
+    comment_form.instance.document_id = document_id
+    if comment_form.is_valid():
+        comment = comment_form.save()
+    # redirect(reverse('board:detail', args=[document_id]))
+    # reverse -> url pattern을 가지고 주소를 만들어 주는 함수
+    # reverse_lazy -> url pattern을 가지고 주소를 만들어주지만 평가가 나중에 일어남
+    # 실제 호출 될 때 평가한다
+    # redirect는 HTTPResposeRedirect를 포함한다
+    return redirect(document)
+
+"""
+페이지에 접근했을 때 구동되는 로직들
+함수형 뷰
+1) 해당 객체가 있는지 확인 - get_object_or_404, objects.get, objects.filter.exists
+2) 객체에 대한 권한 체크 - 작성자, 관리자
+3-1) get -> 해당 페이지에 필요한 값 입력받기
+3-2) post -> 입력받는 값에 대한 처리 -> 삭제, 업데이트
+4) 처리 후 페이지 이동
+
+클래스형 뷰
+def dispatch(self, request, *args, **kwargs):
+    object = self.get_object()
+    #권한체크
+    # supper().dispath(request, *args, **kwargs)
+    # 만약 분기한다면 아래코드로!
+    if request.method == "POST":
+        # supper().post(request, *args, **kwargs)
+    else:
+        # supper().get(request, *args, **kwargs)
+1) 해당 객체가 있는지 확인 - dispatch
+2) 해당 객체가 있는지 확인 - get_object, get_queryset
+2) 객체에 대한 권한 체크 - 작성자, 관리자
+3-1) get -> 해당 페이지에 필요한 값 입력받기 - def get
+3-2) post -> 입력받는 값에 대한 처리 -> 삭제, 업데이트 - def post
+4) 처리 후 페이지 이동
+"""
+from django.contrib import messages
+from .models import Comment
+def comment_update(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    document = get_object_or_404(Document, pk=comment.document.id)
+    # user.is_staff
+    # user.is_superuser
+    if request.user != comment.author:
+        messages.warning(request, "권한없음")
+        return redirect(document)
+
+    if request.method == "POST":
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            return redirect(document)
+    else:
+        form = CommentForm(instance=comment)
+        return render(request, 'board/comment/comment_update.html', {'form':form})
+
+def comment_delete(request, comment_id):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    document = get_object_or_404(Document, pk=comment.document.id)
+
+    if request.user != comment.author and not request.user.is_staff and request.user != document.author:
+        message.warning(request, "권한 없음")
+        return redirect(document)
+
+    if request.method == "POST":
+        comment.delete()
+        return redirect(document)
+    else:
+        return render(request, 'board/comment/comment_delete.html', {'object':comment})
+
 
 def document_delete(request, document_id):
     # 객체 불러와서, delete만 호출

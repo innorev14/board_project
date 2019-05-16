@@ -4,11 +4,20 @@ Photo Create
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col"></div>
-    <div class="col-6">
-       {{object.title}} {{object.text}} {{object.image.url}} {{object.author.username}}<br>
+{{object.title}} {{object.text}} {{object.image.url}} {{object.author.username}}<br>
+<hr>
+<form action="{% url 'board:comment_create' object.id %}" method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <div class="col-8">
+            {{comment_form.text}}
+        </div>
+        <div class="col">
+            <input type="submit" value="Comment" class="btn btn-outline-primary form-control">
+        </div>
     </div>
-    <div class="col"></div>
+</form>
+<div id="docs_comment_list_area">
+    {% include 'board/comment_list.html' %}
 </div>
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Document
+from .models import Category, Document, Comment
 
 # Register your models here.
 class CategoryOption(admin.ModelAdmin):
@@ -9,8 +9,14 @@ class CategoryOption(admin.ModelAdmin):
 
 admin.site.register(Category, CategoryOption)
 
+class CommentInLine(admin.TabularInline):
+    model = Comment
+
 class DocumentOption(admin.ModelAdmin):
     list_display = ['id', 'author', 'title', 'slug', 'created', 'updated']
     prepopulated_fields = {'slug':('title',)}
+    inline = [CommentInLine]
 
 admin.site.register(Document, DocumentOption)
+
+admin.site.register(Comment)
